@@ -107,7 +107,8 @@ gradeHands();
 
 // create array with type + hand = rank
 foreach($hands as $key => $hand) {
-	$preRank[$key] = $hand[$theType] . $hand[$theHand];
+	// for weird reasons, the sort doesn't work correctly without the " 1"
+	$preRank[$key] = $hand[$theType] . $hand[$theHand] . " 1";
 }
 sort($preRank);
 
@@ -115,7 +116,7 @@ sort($preRank);
 foreach($hands as $key1 => $hand) {
 	$handType = $hand[$theType];
 	$handValue = $hand[$theHand];
-	$key2 = array_search($handType . $handValue, $preRank);
+	$key2 = array_search($handType . $handValue . " 1", $preRank);
 	$hands[$key1][$theRank] = $key2 + 1;
 }
 
