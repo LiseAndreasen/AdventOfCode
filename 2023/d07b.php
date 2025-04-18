@@ -113,20 +113,18 @@ foreach(preg_split("/((\r?\n)|(\r\n?))/", $input) as $line) {
 
 // add type to each hand
 gradeHands();
-print_r($hands);
 
 // create array with type + hand = rank
 foreach($hands as $key => $hand) {
-	// for weird reasons, the sort doesn't work correctly without the " 1"
-	$preRank[$key] = $hand[$theType] . $hand[$theHand] . " 1";
+	$preRank[$key] = $hand[$theType] . $hand[$theHand];
 }
-sort($preRank);
+sort($preRank, SORT_STRING);
 
 // mate hand with rank
 foreach($hands as $key1 => $hand) {
 	$handType = $hand[$theType];
 	$handValue = $hand[$theHand];
-	$key2 = array_search($handType . $handValue . " 1", $preRank);
+	$key2 = array_search($handType . $handValue, $preRank);
 	$hands[$key1][$theRank] = $key2 + 1;
 }
 
