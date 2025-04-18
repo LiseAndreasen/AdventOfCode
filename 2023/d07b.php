@@ -118,6 +118,9 @@ gradeHands();
 foreach($hands as $key => $hand) {
 	$preRank[$key] = $hand[$theType] . $hand[$theHand];
 }
+
+// https://www.reddit.com/r/adventofcode/comments/1k0nia4/2023_day_7_part_1_php_help/
+
 sort($preRank, SORT_STRING);
 
 // mate hand with rank
