@@ -5,8 +5,22 @@
 
 $input = file_get_contents('./d12input2.txt', true);
 
+// part 1 or part 2?
+$part = 2;
+
 ///////////////////////////////////////////////////////////////////////////
 // functions
+
+function put_record_back_to_string($record) {
+	foreach($record as $key => $content) {
+		if($key == 0) {
+			$tmp_record = $content . " ";
+		} else {
+			$tmp_record .= $content . ",";
+		}
+	}
+	return $tmp_record;
+}
 
 // possible format:
 // .??..??...?##.	1,1,3
@@ -15,35 +29,44 @@ $input = file_get_contents('./d12input2.txt', true);
 // go through all possible permutations, recursively
 // remove only 1 character from the string every time
 function permute($record, $in_group) {
+	global $permute_result;
+	$local_record = put_record_back_to_string($record);
+	// memoization
+	if(isset($permute_result[$local_record]) && isset($permute_result[$local_record][$in_group])) {
+		return $permute_result[$local_record][$in_group];
+	}
 
-	global $valid_permutations;
-	
 	// end if there are no numbers left
 	if(sizeof($record) == 1) {
 		// valid if there are no groups in the rest of the string
 		$counts = count_chars($record[0]);
 		$hash_value = ord("#");
 		if($counts[$hash_value] == 0) {
-			$valid_permutations++;
+			$permute_result[$local_record][$in_group] = 1;
+			return 1;
 		}
-		return;
+		$permute_result[$local_record][$in_group] = 0;
+		return 0;
 	}
 
 	// end if there is no string left
 	if(strlen($record[0]) == 0) {
 		// valid if only 1 number was left, and it was 0
 		if(sizeof($record) == 2 && $record[1] == 0) {
-			$valid_permutations++;
+			$permute_result[$local_record][$in_group] = 1;
+			return 1;
 		}
-		return;
+		$permute_result[$local_record][$in_group] = 0;
+		return 0;
 	}
 
+	$local_valid = 0;
 	if($in_group == 0) {
 		// snip off beginning dot
 		if($record[0][0] == ".") {
 			$record_local = $record;
 			$record_local[0] = substr($record_local[0],1);
-			permute($record_local, 0);
+			$local_valid += permute($record_local, 0);
 		}
 
 		// group might begin
@@ -51,14 +74,14 @@ function permute($record, $in_group) {
 			$record_local = $record;
 			$record_local[0] = substr($record_local[0],1);
 			$record_local[1]--;
-			permute($record_local, 1);
+			$local_valid += permute($record_local, 1);
 		}
 		
 		// group might not begin
 		if($record[0][0] == "?") {
 			$record_local = $record;
 			$record_local[0] = substr($record_local[0],1);
-			permute($record_local, 0);
+			$local_valid += permute($record_local, 0);
 		}
 	}
 	
@@ -71,10 +94,7 @@ function permute($record, $in_group) {
 				unset($record_local[1]);
 				// reindex
 				$record_local = [...$record_local];
-				permute($record_local, 0);
-			} else {
-				// this permutation was impossible
-				return;
+				$local_valid += permute($record_local, 0);
 			}
 		} else {
 			// group is still going
@@ -82,14 +102,12 @@ function permute($record, $in_group) {
 				$record_local = $record;
 				$record_local[0] = substr($record_local[0],1);
 				$record_local[1]--;
-				permute($record_local, 1);
-			} else {
-				// this permutation was impossible
-				return;
+				$local_valid += permute($record_local, 1);
 			}
 		}
 	}
-	
+	$permute_result[$local_record][$in_group] = $local_valid;
+	return $local_valid;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -104,11 +122,28 @@ foreach(preg_split("/((\r?\n)|(\r\n?))/", $input) as $line) {
 	}
 }
 
-//print_r($records);
+if($part == 2) {
+	foreach($records as $record) {
+		$record_tmp = array();
+		$springs = $record[0];
+		$numbers = $record;
+		unset($numbers[0]);
+		for($i=2;$i<=5;$i++) {
+			$springs .= "?" . $record[0];
+		}
+		$record_tmp[] = $springs;
+		for($i=1;$i<=5;$i++) {
+			$record_tmp = array_merge($record_tmp, $numbers);
+		}
+		$records2[] = $record_tmp;
+	}
+	$records = $records2;
+}
 
+$permute_result = array();
 $valid_permutations = 0;
 foreach($records as $record) {
-	permute($record, 0);
+	$valid_permutations += permute($record, 0);
 }
 
 printf("Number of valid permutations: %d\n", $valid_permutations);
