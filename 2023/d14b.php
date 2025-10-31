@@ -52,6 +52,33 @@ function roll_map($map) {
 	return $map;
 }
 
+function spin($map) {
+	//								$map[$x][$y]
+
+	// roll round rocks north/up
+	$map = roll_map($map);
+
+	// roll west/left
+	$map = pivot($map);				// now y left, x down
+	$map = roll_map($map);
+
+	// roll south/down
+	$map = array_reverse($map);		// now -y left, x down
+	$map = pivot($map);				// now x left, -y down
+	$map = roll_map($map);
+	$map = pivot($map);				// now -y left, x down
+	$map = array_reverse($map);		// now y left, x down
+
+	// roll east/right
+	$map = pivot($map);				// now x left, y down
+	$map = array_reverse($map);		// now -x left, y down
+	$map = pivot($map);				// now y left, -x down
+	$map = roll_map($map);
+	$map = pivot($map);				// now -x left, y down
+	$map = array_reverse($map);		// now x left, y down
+	return $map;
+}
+
 function calculate_load($map) {
 	$map = pivot($map);
 	$load_sum = 0;
@@ -82,7 +109,35 @@ foreach(preg_split("/((\r?\n)|(\r\n?))/", $input) as $line) {
 
 $map = pivot($map);
 
-$map = roll_map($map);
+$all_maps = array();
+// part 2: 1000000000
+// theory: the map will become cyclic, being the same after n spins
+$spins = 1000000000;
+for($i=1;$i<=$spins;$i++) {
+	$map = spin($map);
+	$map_collapse = implode("", array_merge(...$map));
+	if(isset($all_maps[$map_collapse])) {
+		break;
+	} else {
+		$all_maps[$map_collapse] = $i;
+	}
+}
+
+$spins_part1 = $all_maps[$map_collapse];
+$spins_cycle = $i - $spins_part1;
+$spins_part2 = floor(($spins - $spins_part1)/$spins_cycle) * $spins_cycle;
+$spins_part3 = $spins - $spins_part1 - $spins_part2;
+printf("Go %d spins, to reach a state that repeats.\n", $spins_part1);
+printf("Go %d spins, in a cycle.\n", $spins_cycle);
+printf("Go %d spins, to reach that state again.\n", $spins_part2);
+printf("Go %d spins, to finish.\n", $spins_part3);
+//print($map_collapse . "\n");
+//print_r($all_maps);
+//print_map($map);
+
+for($i=1;$i<=$spins_part3;$i++) {
+	$map = spin($map);
+}
 
 // calculate load of rocks
 $load_sum = calculate_load($map);
