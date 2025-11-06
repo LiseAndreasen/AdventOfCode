@@ -167,7 +167,32 @@ function beam_moves($map, $begin, $dir) {
 				break;
 		}
 	}
+}
+
+function check_position($map, $begin, $dir) {
+	global $map_e, $map_v;
 	
+	// make a copy of the map, only registering energized tiles - initialize
+	// also make a copy of the map to register
+	// whether this tile has been visited before going in this direction
+	// go through all parts of map
+	for($i=0;$i<sizeof($map);$i++) {
+		$map_e[$i] = array();
+		$map_v[$i] = array();
+		for($j=0;$j<sizeof($map[$i]);$j++) {
+			$map_e[$i][$j] = ".";
+			$map_v[$i][$j] = array();
+		}
+	}
+
+	// send the beam
+	beam_moves($map, $begin, $dir);
+
+	// count energized tiles on map
+	$energy = array_merge(...$map_e);
+	$counts = array_count_values($energy);
+	return $counts["#"];
+
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -176,29 +201,48 @@ function beam_moves($map, $begin, $dir) {
 $map = get_input($input);
 $map = pivot($map);
 
-// make a copy of the map, only registering energized tiles - initialize
-// also make a copy of the map to register
-// whether this tile has been visited before going in this direction
-// go through all parts of map
-for($i=0;$i<sizeof($map);$i++) {
-	$map_e[$i] = array();
-	$map_v[$i] = array();
-	for($j=0;$j<sizeof($map[$i]);$j++) {
-		$map_e[$i][$j] = ".";
-		$map_v[$i][$j] = array();
-	}
-}
-
 // beam starts top left moving right
 $begin = array(0,0);
 $dir = "r";
 
 // send the beam
-beam_moves($map, $begin, $dir);
+$count_hash = check_position($map, $begin, $dir);
 
 // count energized tiles on map
-$energy = array_merge(...$map_e);
-$counts = array_count_values($energy);
-printf("Energized tiles: %d\n", $counts["#"]);
+printf("Energized tiles in primary position: %d\n", $count_hash);
+
+// go through all possible positions, finding the most energy
+
+$map_height = sizeof($map);
+$map_width = sizeof($map[0]);
+
+for($i=0;$i<$map_width;$i++) {
+	// going down
+	$new_count = check_position($map, array($i,0), "d");
+	if($new_count > $count_hash) {
+		$count_hash = $new_count;
+	}
+
+	// going up
+	$new_count = check_position($map, array($i,$map_height-1), "u");
+	if($new_count > $count_hash) {
+		$count_hash = $new_count;
+	}
+}
+for($j=0;$j<$map_height;$j++) {
+	// going right
+	$new_count = check_position($map, array(0,$j), "r");
+	if($new_count > $count_hash) {
+		$count_hash = $new_count;
+	}
+
+	// going left
+	$new_count = check_position($map, array($map_width-1,$j), "l");
+	if($new_count > $count_hash) {
+		$count_hash = $new_count;
+	}
+}
+
+printf("Energized tiles in best position...: %d\n", $count_hash);
 
 ?>
