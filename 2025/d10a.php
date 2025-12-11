@@ -134,6 +134,7 @@ function print_format_for_python($c, $a, $jolts) {
 	$text .= implode(",", $jolts);
 	$text .= "]\n";
 	
+	// the next line was stolen
 	$text .= "res = scipy.optimize.linprog(c, A_eq=A, b_eq=jolts, integrality=1)\n";
 	$text .= "ans += sum(res.x)\n";
 	
@@ -144,7 +145,7 @@ function print_format_for_python($c, $a, $jolts) {
 
 // using python
 // 1 line stolen from
-// https://topaz.github.io/paste/#XQAAAQD2BwAAAAAAAAA0m0pnuFI8c/sCZpj5NzYXHXBnhdocW1pSPf80bErWxIRLp+gSTO1p2Tm0sOGw2RPAi03lJjx12LPjomkYSl9Gz+lVkv8yQ36ctp6NxlqZXkC2MKpgY88Gk70oQ0uBAIOKs8Vet4cngEBBZp0uoGVk9a7rPwWfJ2YS/zwxL/Tpm7sdIb+Ry6YZU/eiTQ4qHAVvy9JYHukHZ1hyEg7gakxOTgjK+oGqZj+I4eWdIYfDzqGvjqDXNZxJtRle+yhspxE491qQVAsvg0J4A2eS638GBJA7wAJgrV5SCeYu42Mztd5QAKy3A+7MsRy34cKuB26/rgAltjnGhqAUPoMpALSgbRDDYRTpt5ia6LlBVTlwByFJMP+EfLIXFmGNqBkhlN6MW+Hl3w/Tm16VbV21utQdkNWSRpKRthenQfwmSm9zWKkkjvkyXjkZoj9bGYiNQUZMBLFdyIF3HTudnzCjFc/y/ZPCKdzyCbby+khe0yX2N90UD9xkeVN5/th0QlHdXe9txhSTeEqwaw05bNkV1v2KL+slKRYzwcmVpJ6+RRUqc01VK5SwBT2FT+IqiNUb35fN/qOHddNamWi6jumJUe5tubePloqePUL9ZvCFGELM+hlax4h9pB/FrNXyn5Vxt1j5V6Y8LxAmeD8F53DstgJ7JGpxdH0uboTv1qUNFbLMFlMktkXttgZZOaZgr3q5hKKH+upCZHg8P3Br+gvOTcu0WpfLcNrPmx92bWCR665I+9CFtj/xZ8U9QCrI9plLOrsniJu+5l+cEuhiJW4gDhT2RO7aKMFQL/lW86tTGGIJuKWV29CCrzaci+Xs4Uj9ArHgFLtpuC3Dk0rB4uYcGUsfILIloKTRjBchlUiyUUgRA7FJYfQgRHuMHvZUpszlkkE1Y0yXRVIgbTB5bS5IEtJXjT+F31ilQ5p76p1BcN3GLFQjIG+V2aEiNHrht6EzKNdJYTiZJQV+8M/I+LmygrwFEYksLlNIjFsjH3TwAAHVSDZj0qTLRbhFUhZwqtvUp64NSwxtDvKqi4FkXp9p/qooFEj20XZ87taXR1PL1pjTYRVsbFlqoz93FgNfPgNsDA97YTbWHO2mIMoJv9EKpx3DtnHOkags/+VuGM4=
+// https://www.reddit.com/r/adventofcode/comments/1pity70/comment/ntb48ll/
 
 function press_buttons2b($target_jolt, $buttons) {
 	$buttons_sz = sizeof($buttons);
