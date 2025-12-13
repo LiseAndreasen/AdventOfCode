@@ -32,14 +32,17 @@ function get_input($input) {
 
 $data = get_input($input);
 
-$yes_no = 0;
+$yes_no = 0; // yes number...
 foreach($data as $region) {
-	$region_sz = $region[0][0] * $region[0][1];
-	$present_sz = array_sum($region[1]) *  7;
+	$region_sz = floor($region[0][0] / 3) * floor($region[0][1] / 3);
+	$present_sz = array_sum($region[1]);
+	//printf("Region %d x %d. Presents %d. ",
+	//	$region[0][0], $region[0][1], $present_sz);
+	//printf("Region (%d) < Presents (%d)? ", $region_sz, $present_sz);
 	if($region_sz < $present_sz) {
-		//print("No!\n");
+		//print("Oh no!\n");
 	} else {
-		//print("Yes!\n");
+		//print("Oh yes!\n");
 		$yes_no++;
 	}
 }
