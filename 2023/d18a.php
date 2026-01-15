@@ -4,6 +4,7 @@
 // constants
 
 $input = file_get_contents('./d18input2.txt', true);
+$part = 2;
 
 ///////////////////////////////////////////////////////////////////////////
 // functions
@@ -99,6 +100,32 @@ function fill_in_map(&$map, $data_x, $data_y) {
 	}
 }
 
+function directions($dig, $part) {
+	if($part == 1) {
+		$dig_dir = $dig[0];
+		$dig_lgt = $dig[1];
+	} else {
+		$dir_char = substr($dig[2], -2, 1);
+		$dig_lgt = hexdec(substr($dig[2], 2, 5));
+		switch($dir_char) {
+			// 0 means R, 1 means D, 2 means L, and 3 means U
+			case "0":
+				$dig_dir = "R";
+				break;
+			case "1":
+				$dig_dir = "D";
+				break;
+			case "2":
+				$dig_dir = "L";
+				break;
+			case "3":
+				$dig_dir = "U";
+				break;
+		}
+	}
+	return [$dig_dir, $dig_lgt];
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // main program
 
@@ -109,8 +136,7 @@ $x = 0;
 $y = 0;
 // make list of x and y actually used, including neighbs
 foreach($data as $dig) {
-	$dig_dir = $dig[0];
-	$dig_lgt = $dig[1];
+	[$dig_dir, $dig_lgt] = directions($dig, $part);
 	if($dig_dir == "L") {
 		$x -= $dig_lgt;
 	}
@@ -139,8 +165,7 @@ $y = 0;
 $map[$x][$y] = "*"; // will be fixed later
 $old_dir = "*"; // undefined
 foreach($data as $dig) {
-	$dig_dir = $dig[0];
-	$dig_lgt = $dig[1];
+	[$dig_dir, $dig_lgt] = directions($dig, $part);
 	if($old_dir != "*") {
 		$map[$x][$y] = corner_char($old_dir, $dig_dir);
 	}
@@ -258,5 +283,6 @@ foreach($data_x as $x) {
 }
 
 printf("Size of lava lagoon: %d\n", $lava_map);
+// 77366730801323 too low
 
 ?>
