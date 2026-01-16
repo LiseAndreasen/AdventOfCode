@@ -19,19 +19,6 @@ function get_input($input) {
 	return $data;
 }
 
-function print_map($map, $data_x, $data_y) {
-	foreach($data_y as $j) {
-		foreach($data_x as $i) {
-			echo $map[$i][$j];
-		}
-		echo "\n";
-	}
-	for($i=0;$i<max($data_x)-min($data_x);$i++) {
-		echo "=";
-	}
-	echo "\n";
-}
-
 // which character represents this corner of the lagoon?
 function corner_char($old_dir, $dig_dir) {
 	if($old_dir == "U" && $dig_dir == "L") {
@@ -283,6 +270,5 @@ foreach($data_x as $x) {
 }
 
 printf("Size of lava lagoon: %d\n", $lava_map);
-// 77366730801323 too low
 
 ?>
