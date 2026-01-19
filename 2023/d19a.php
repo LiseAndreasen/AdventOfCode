@@ -66,35 +66,18 @@ function compare_this($value1, $comparator, $value2) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-// main program
-
-[$rules, $parts] = get_input($input);
-//print_r($rules);
-//print_r($parts);
-
-$accepted_sum = 0;
-
-foreach($parts as $part) {
+function test_part($part, $rules) {
 	$rule = "in";
 	$decided = "0";
-
-//print("\n\n");
-//printf("%s\n", implode(",", $part));
 	
 	while($decided == "0") {
-//print("$rule,");
 		foreach($rules[$rule] as $key => $subrule) {
-//print_r($subrule);
-//print("\n");
 			if(strcmp($key, "last") == 0) {
 				if($subrule == "A") {
-//					print("Part accepted!\n");
 					$decided = "A";
 					break;
 				}
 				if($subrule == "R") {
-//					print("\nPart rejected!\n");
 					$decided = "R";
 					break;
 				}
@@ -122,12 +105,10 @@ foreach($parts as $part) {
 				$compare = compare_this($this_value, $rule_type, $rule_cond[1]);
 				if($compare) {
 					if($rule_jump == "A") {
-//						print("Part accepted!\n");
 						$decided = "A";
 						break;
 					}
 					if($rule_jump == "R") {
-//						print("\nPart rejected!\n");
 						$decided = "R";
 						break;
 					}
@@ -140,14 +121,113 @@ foreach($parts as $part) {
 			}
 		}
 	}
-	
+	return $decided;
+}
+
+///////////////////////////////////////////////////////////////////////////
+// main program
+
+[$rules, $parts] = get_input($input);
+
+$accepted_sum = 0;
+
+foreach($parts as $part) {
+	$decided = test_part($part, $rules);
 	if($decided == "A") {
 		$this_sum = array_sum($part);
 		$accepted_sum += $this_sum;
-//		print_r($part);
 	}
 }
 
 printf("Result 1: %d\n", $accepted_sum);
+
+$accepted_sum = 0;
+$part_down["x"] = 1;
+$part_down["m"] = 1;
+$part_down["a"] = 1;
+$part_down["s"] = 1;
+$part_up["x"] = 4000;
+$part_up["m"] = 4000;
+$part_up["a"] = 4000;
+$part_up["s"] = 4000;
+$choices = [["in", $part_down, $part_up]];
+//print_r($choices);
+
+while(0 < sizeof($choices)) {
+	$choice = array_shift($choices);
+	[$rule, $part_down, $part_up] = $choice;
+	foreach($rules[$rule] as $key => $subrule) {
+		if(strcmp($key, "last") != 0) {
+			[$comp, $char, $jump] = $subrule;
+			[$char_char, $char_val] = $char;
+			if($part_down[$char_char] <= $char_val && $char_val <= $part_up[$char_char]) {
+				// split out the cases and possibly add to queue
+
+				$part_down_low = $part_down;
+				$part_up_low = $part_up;
+				$part_down_high = $part_down;
+				$part_up_high = $part_up;
+				if($comp == "<") {
+					$part_up_low[$char_char] = $char_val - 1;
+					$part_down_high[$char_char] = $char_val;
+					switch($jump) {
+						case "A":
+							$accepted_sum += ($part_up_low["x"] - $part_down_low["x"] + 1)
+								* ($part_up_low["m"] - $part_down_low["m"] + 1)
+								* ($part_up_low["a"] - $part_down_low["a"] + 1)
+								* ($part_up_low["s"] - $part_down_low["s"] + 1);
+							break;
+						case "R":
+							break;
+						default:
+							$new_choice = [$jump, $part_down_low, $part_up_low];
+							$choices[] = $new_choice;
+							break;
+					}
+					$part_down = $part_down_high;
+					$part_up = $part_up_high;
+				} else {
+					$part_up_low[$char_char] = $char_val;
+					$part_down_high[$char_char] = $char_val + 1;
+					switch($jump) {
+						case "A":
+							$accepted_sum += ($part_up_high["x"] - $part_down_high["x"] + 1)
+								* ($part_up_high["m"] - $part_down_high["m"] + 1)
+								* ($part_up_high["a"] - $part_down_high["a"] + 1)
+								* ($part_up_high["s"] - $part_down_high["s"] + 1);
+							break;
+						case "R":
+							break;
+						default:
+							$new_choice = [$jump, $part_down_high, $part_up_high];
+							$choices[] = $new_choice;
+							break;
+					}
+					$part_down = $part_down_low;
+					$part_up = $part_up_low;
+				}
+			} else {
+				// there's no splitting
+			}
+		} else {
+			switch($subrule) {
+				case "A":
+					$accepted_sum += ($part_up["x"] - $part_down["x"] + 1)
+						* ($part_up["m"] - $part_down["m"] + 1)
+						* ($part_up["a"] - $part_down["a"] + 1)
+						* ($part_up["s"] - $part_down["s"] + 1);
+					break;
+				case "R":
+					break;
+				default:
+					$new_choice = [$subrule, $part_down, $part_up];
+					$choices[] = $new_choice;
+					break;
+			}
+		}
+	}
+}
+
+printf("Result 2: %s\n", $accepted_sum);
 
 ?>
