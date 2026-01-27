@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////
 // constants
 
-$input = file_get_contents('./d22input1.txt', true);
+$input = file_get_contents('./d22input2.txt', true);
 
 ///////////////////////////////////////////////////////////////////////////
 // functions
@@ -168,6 +168,7 @@ function data_2_tower($data) {
 }
 
 function drop_bricks($tower, $bricks) {
+	$dropped = [];
 	// drops did occur in this round?
 	$drops = 1;
 	while($drops == 1) {
@@ -185,6 +186,7 @@ function drop_bricks($tower, $bricks) {
 				}
 			} // for each cube in brick
 			if($brick_can_drop == 1) {
+				$dropped[$brick_id] = $brick_id;
 				foreach($brick as $c => $cube) {
 					[$x, $y, $z] = $cube;
 					// decrease z coordinate
@@ -195,13 +197,11 @@ function drop_bricks($tower, $bricks) {
 				$drops = 1;
 			} // brick dropping or not
 		} // for each brick
-	} // try for a drop
-	return [$tower, $bricks];
+	} // try for any drops
+	return [$tower, $bricks, sizeof($dropped)];
 }
 
-function bricks_will_fall($brick_id, $supports, $rests_on, $level) {
-	// level can be 1 (1 level) or 0 (all levels)
-	
+function bricks_will_fall($brick_id, $supports, $rests_on) {
 	$num_falls = 0;
 	if(isset($supports[$brick_id])) {
 		// for each brick i am supporting
@@ -253,13 +253,30 @@ $data = get_input($input);
 
 [$bricks, $tower, $min, $max] = data_2_tower($data);
 
-[$tower, $bricks] = drop_bricks($tower, $bricks);
+[$tower, $bricks, $dropped] = drop_bricks($tower, $bricks);
 
 [$supports, $rests_on] = analyze_bricks($tower, $bricks);
+
 $num = number_of_safe_bricks($tower, $bricks, $supports, $rests_on);
 
 printf("Result 1: %d\n", $num);
 
-// expand to include a supports b supports c etc.
+$num = 0;
+foreach($bricks as $brick_id => $brick) {
+	print($brick_id); // progress
+	// remove brick, drop the rest, count how many actually dropped
+	$tower_less = $tower;
+	$bricks_less = $bricks;
+	foreach($brick as $cube) {
+		[$x, $y, $z] = $cube;
+		unset($tower_less[$x][$y][$z]);
+	}
+	unset($bricks_less[$brick_id]);
+	[$t, $b, $dropped] = drop_bricks($tower_less, $bricks_less);
+	$num += $dropped;
+}
+print("\n");
+
+printf("Result 2: %d\n", $num);
 
 ?>
