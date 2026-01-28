@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////
 // constants
 
-$input = file_get_contents('./d23input2.txt', true);
+$input = file_get_contents('./d23input1.txt', true);
 
 ///////////////////////////////////////////////////////////////////////////
 // functions
@@ -43,56 +43,66 @@ function print_map($map) {
 	echo "\n";
 }
 
-function walk_path($map, $here, $end, $l) {
-	global $max_walk;
+function walk_path($here, $end, $l, $slippery) {
+	// global data necessary, to save memory
+	global $data, $max_walk, $progress;
+
+	$progress++;
+	if($progress % 1000000 == 0) {		
+		print("."); // progress
+	}
 	
 	// already walked tiles will be marked
 	[$x0, $y0] = $here;
-	$map[$x0][$y0] = "O";
+	$prev_tile = $data[$x0][$y0];
+	$data[$x0][$y0] = "O";
 	
 	if($x0 == $end[0] && $y0 == $end[1]) {
 		// printf("Path walked, length %d\n", $l);
 		if($max_walk < $l) {
 			$max_walk = $l;
 		}
+		$data[$x0][$y0] = $prev_tile;
 		return 1;
 	}
 
-	if(isset($map[$x0-1][$y0])) {
-		$poss = $map[$x0-1][$y0];
-		if($poss != "#") {
-			if($poss == "." || $poss == "<") {
-				walk_path($map, [$x0-1, $y0], $end, $l+1);
+	if(isset($data[$x0-1][$y0])) {
+		$poss = $data[$x0-1][$y0];
+		if($poss != "#" && $poss != "O") {
+			if($poss == "." || ($poss == "<" || strcmp($slippery, "icy") != 0)) {
+				walk_path([$x0-1, $y0], $end, $l+1, $slippery);
 			}
 		}
 	}
 
-	if(isset($map[$x0+1][$y0])) {
-		$poss = $map[$x0+1][$y0];
-		if($poss != "#") {
-			if($poss == "." || $poss == ">") {
-				walk_path($map, [$x0+1, $y0], $end, $l+1);
+	if(isset($data[$x0+1][$y0])) {
+		$poss = $data[$x0+1][$y0];
+		if($poss != "#" && $poss != "O") {
+			if($poss == "." || ($poss == ">" || strcmp($slippery, "icy") != 0)) {
+				walk_path([$x0+1, $y0], $end, $l+1, $slippery);
 			}
 		}
 	}
 
-	if(isset($map[$x0][$y0-1])) {
-		$poss = $map[$x0][$y0-1];
-		if($poss != "#") {
-			if($poss == "." || $poss == "^") {
-				walk_path($map, [$x0, $y0-1], $end, $l+1);
+	if(isset($data[$x0][$y0-1])) {
+		$poss = $data[$x0][$y0-1];
+		if($poss != "#" && $poss != "O") {
+			if($poss == "." || ($poss == "^" || strcmp($slippery, "icy") != 0)) {
+				walk_path([$x0, $y0-1], $end, $l+1, $slippery);
 			}
 		}
 	}
 
-	if(isset($map[$x0][$y0+1])) {
-		$poss = $map[$x0][$y0+1];
-		if($poss != "#") {
-			if($poss == "." || $poss == "v") {
-				walk_path($map, [$x0, $y0+1], $end, $l+1);
+	if(isset($data[$x0][$y0+1])) {
+		$poss = $data[$x0][$y0+1];
+		if($poss != "#" && $poss != "O") {
+			if($poss == "." || ($poss == "v" || strcmp($slippery, "icy") != 0)) {
+				walk_path([$x0, $y0+1], $end, $l+1, $slippery);
 			}
 		}
 	}
+
+	$data[$x0][$y0] = $prev_tile;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -103,10 +113,17 @@ $data = pivot(get_input($input));
 $w = sizeof($data);
 $s = [1, 0];
 $e = [$w - 2, $w - 1];
-// max_walk will change
+// max_walk and progress will change
 $max_walk = 0;
-walk_path($data, $s, $e, 0);
+$progress = 0;
+// data will change, but will be changed back
+walk_path($s, $e, 0, "icy");
 
-printf("Result 1: %d\n", $max_walk);
+printf("\nResult 1: %d\n", $max_walk);
+
+$max_walk = 0;
+walk_path($s, $e, 0, "dry");
+
+printf("\nResult 2: %d\n", $max_walk);
 
 ?>
