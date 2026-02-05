@@ -55,10 +55,13 @@ function push_button($data, $modules, &$states, &$memory, &$no_pulses, $i, &$cyc
 	// let pulse travel
 	while(0 < sizeof($pulses)) {
 		[$in, $phl, $pname] = array_shift($pulses);
+		// detect possible cycle
+		// only tg leads to rx
 		if(strcmp($phl, "high") == 0 && strcmp($pname, "tg") == 0) {
 			if(!isset($cycles[$in])) {
-				$cycles[$in] = $i;
+				$cycles[$in][0] = $i;
 			}
+			$cycles[$in][1][] = $i;
 		}
 		$mtype = $modules[$pname][1];
 		if($mtype == "%") {
@@ -141,7 +144,7 @@ $no_pulses["low"] = 0;
 $no_pulses["high"] = 0;
 $cycles = [];
 
-$max_i = 10000; // part 1: 1000, part 2: 10000
+$max_i = 100000; // part 1: 1000, part 2: 10000
 for($i=1;$i<=$max_i;$i++) {
 	# states and memory and no_pulses and cycles will change
 	push_button($data, $modules, $states, $memory, $no_pulses, $i, $cycles);
@@ -151,8 +154,9 @@ printf("Result 1: %d\n", $no_pulses["low"] * $no_pulses["high"]);
 
 if(sizeof($cycles) == 4) {
 	$prod = 1;
-	foreach($cycles as $cycle) {
-		$prod *= $cycle;
+	foreach($cycles as $mname => $cycle) {
+		printf("Control: %s, 1c = %5d, 10d = %5d, 20d = %5d\n", $mname, $cycle[1][0], $cycle[1][9], $cycle[1][19]);
+		$prod *= $cycle[0];
 	}
 	printf("Result 2: %d\n", $prod);
 }
