@@ -26,8 +26,6 @@ function get_input($input) {
 
 $data = get_input($input);
 
-//print_r($data);
-
 $food_sum = 0;
 $food_sum_max = 0;
 foreach($data as $food) {
@@ -45,7 +43,6 @@ foreach($data as $food) {
 printf("Result 1: %d\n", $food_sum_max);
 
 sort($all_food_sums);
-//print_r($all_food_sums);
 
 $max_sum = 0;
 for($i=0;$i<3;$i++) {
