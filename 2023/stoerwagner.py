@@ -12,6 +12,8 @@ __author__ = 'ysitu <ysitu@users.noreply.github.com>'
 # All rights reserved.
 # BSD license.
 
+# https://github.com/valiantljk/graph-partition/blob/master/algorithms/connectivity/stoerwagner.py
+
 __all__ = ['stoer_wagner']
 
 
