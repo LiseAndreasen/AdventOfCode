@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////
 // constants
 
-$input = file_get_contents('./d09input1.txt', true);
+$input = file_get_contents('./d09input2.txt', true);
 
 $move["U"] = [ 0, -1];
 $move["D"] = [ 0,  1];
@@ -55,8 +55,6 @@ function move_rope($data, $l) {
     // where has the tail been?
     $tails[$x[$l]][$y[$l]] = 1;
     
-    //printf("head %d %d      ", $x[0], $y[0]);
-    //printf("tail %d %d\n", $x[1], $y[1]);
     foreach ($data as $directions) {
         [$dir, $moves] = $directions;
         for($i=0;$i<$moves;$i++) {
@@ -67,31 +65,31 @@ function move_rope($data, $l) {
                 // distance from this knot to previous knot
                 $x_diff = abs($x[$j] - $x[$j-1]);
                 $y_diff = abs($y[$j] - $y[$j-1]);
-                if(max($x_diff, $y_diff) == 2) {
-                    // tail will move
-                    if($x_diff == 2) {
+                if(2 <= max($x_diff, $y_diff)) {
+                    // knot will move
+                    if($x_diff != 0) {
+                        // move in x direction
                         if($x[$j] < $x[$j-1]) {
                             $x[$j]++;
                         } else {
                             $x[$j]--;
                         }
-                        $y[$j] = $y[$j-1];
-                    } else {
+                    }
+                    if($y_diff != 0) {
+                        // move in y direction
                         if($y[$j] < $y[$j-1]) {
                             $y[$j]++;
                         } else {
                             $y[$j]--;
                         }
-                        $x[$j] = $x[$j-1];
                     }
-                } // move tail?
+                } // move knot?
             }
             $tails[$x[$l]][$y[$l]] = 1;
-//            printf("head %d %d      ", $x[0], $y[0]);
-//            printf("tail %d %d\n", $x[$l], $y[$l]);
         } // doing the moves
     }
 
+    /*
     $xmin = min(array_keys($tails));
     $xmax = max(array_keys($tails));
     $ymin = 0;
@@ -105,6 +103,7 @@ function move_rope($data, $l) {
         }
     }
     print_map($tails, $xmin, $xmax, $ymin, $ymax);
+    */
     
     $tails_flat = array_merge(...$tails);
     $no = sizeof($tails_flat);
@@ -115,14 +114,11 @@ function move_rope($data, $l) {
 // main program
 
 $data = get_input($input);
-//print_r($data);
 
 $no = move_rope($data, 1);
-
 printf("Result 1: %d\n", $no);
 
 $no = move_rope($data, 9);
-
 printf("Result 2: %d\n", $no);
 
 ?>
