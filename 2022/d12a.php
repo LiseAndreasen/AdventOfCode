@@ -98,10 +98,11 @@ foreach ($data as $i => $column) {
             if($right == "E") {
                 $right = "z";
             }
-            if(ord($right) <= ord($me) + 1) {
+            // reverse direction
+            if(ord($me) <= ord($right) + 1) {
                 $graph[$cell_id][$cell_right] = 1;
             }
-            if(ord($me) <= ord($right) + 1) {
+            if(ord($right) <= ord($me) + 1) {
                 $graph[$cell_right][$cell_id] = 1;
             }
         }
@@ -114,32 +115,29 @@ foreach ($data as $i => $column) {
             if($below == "E") {
                 $below = "z";
             }
-            if(ord($below) <= ord($me) + 1) {
+            // reverse direction
+            if(ord($me) <= ord($below) + 1) {
                 $graph[$cell_id][$cell_below] = 1;
             }
-            if(ord($me) <= ord($below) + 1) {
+            if(ord($below) <= ord($me) + 1) {
                 $graph[$cell_below][$cell_id] = 1;
             }
         }
     }
 }
 
-$start_id = convert_to_id($S[0], $S[1]);
+// reverse direction
+$start_id = convert_to_id($E[0], $E[1]);
 $distance = Dijkstra($graph, $start_id, $data_size);
 
-$end_id = convert_to_id($E[0], $E[1]);
+$end_id = convert_to_id($S[0], $S[1]);
 printf("Result 1: %d\n", $distance[$end_id]);
 
 ///////////////////////////////////////////////////////////////////////////
 
 $min_distance = 10000; // big number
-printf("%d a's in all\n", sizeof($all_the_as));
 foreach ($all_the_as as $i => $an_a) {
-    if($i % 10 == 0) {
-        printf("%d ", $i);
-    }
-    $start_id = convert_to_id($an_a[0], $an_a[1]);
-    $distance = Dijkstra($graph, $start_id, $data_size);
+    $end_id = convert_to_id($an_a[0], $an_a[1]);
     $a_distance = $distance[$end_id];
     if($a_distance < $min_distance) {
         $min_distance = $a_distance;
